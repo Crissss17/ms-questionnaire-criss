@@ -1,7 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateQuestionnaireDto } from './create-questionnaire.dto';
-
-export class UpdateQuestionnaireDto extends PartialType(CreateQuestionnaireDto) {
-    title?: string;
-    description?: string; // Opcional
-}
+export class UpdateQuestionnaireDto {
+    readonly name?: string;
+    readonly questions?: Array<{ text: string; answer: string }>;
+  }

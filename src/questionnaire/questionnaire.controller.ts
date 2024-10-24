@@ -1,7 +1,8 @@
-import { Controller, Get, Param, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, NotFoundException, BadRequestException, Body, Put } from '@nestjs/common';
 import { QuestionnaireService } from './questionnaire.service'; // Importa tu servicio de cuestionarios
 import { JwtAuthGuard } from 'src/auth/check-token/jwt-auth.guard'; // Asegúrate de que el guard JWT esté importado correctamente
 import { isValidObjectId } from 'mongoose';
+import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
 
 @Controller('questionnaires')
 @UseGuards(JwtAuthGuard) // Asegúrate de usar el guard para la autenticación
@@ -17,7 +18,6 @@ export class QuestionnaireController {
   }
 
   // Ruta para obtener un cuestionario específico por ID
-  // Controlador para obtener cuestionario por ID
   @Get(':id')
   async findById(@Param('id') id: string) {
     const questionnaire = await this.questionnaireService.findById(id);
@@ -29,5 +29,17 @@ export class QuestionnaireController {
     console.log('Cuestionario encontrado:', questionnaire);
     return questionnaire;
   }
-  
+
+  // Ruta para actualizar un cuestionario
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateQuestionnaireDto: UpdateQuestionnaireDto
+  ) {
+    const updatedQuestionnaire = await this.questionnaireService.update(id, updateQuestionnaireDto);
+    if (!updatedQuestionnaire) {
+      throw new NotFoundException('No se pudo actualizar el cuestionario, no encontrado');
+    }
+    return updatedQuestionnaire;
+  }
 }
