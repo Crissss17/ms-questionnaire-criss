@@ -1,0 +1,15 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: ms-questionnaire-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: toor
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:
