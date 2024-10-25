@@ -8,11 +8,11 @@ import { JwtStrategy } from './JwtStrategy';
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'miSuperSecreto',
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '20s' },
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule],  // Exporta JwtModule y AuthService
+  exports: [AuthService, JwtModule],  
 })
 export class AuthModule {}
