@@ -6,8 +6,8 @@ export class Question {
   @Prop({ required: true })
   text: string;
 
-  @Prop({ required: true })
-  answer: string;
+  @Prop({ required: false })
+  answer?: string;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);
@@ -20,9 +20,8 @@ export class Questionnaire extends Document {
   @Prop({ type: [QuestionSchema], required: true })
   questions: Question[];
 
-  @Prop({ type: String })  // Permitir que _id sea un string
-  _id: string;
+  @Prop({ type: String, required: false })
+  vehiculo?: string;
 }
-
 
 export const QuestionnaireSchema = SchemaFactory.createForClass(Questionnaire);

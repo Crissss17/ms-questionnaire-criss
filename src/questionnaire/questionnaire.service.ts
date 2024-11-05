@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Questionnaire } from './schemas/questionnaire.schema';
+import { CreateQuestionnaireDto} from './dto/create-questionnaire.dto';
 import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
 
 @Injectable()
@@ -17,11 +18,16 @@ export class QuestionnaireService {
 
   // Método para buscar un cuestionario por su ID
   async findById(id: string): Promise<Questionnaire> {
-    const questionnaire = await this.questionnaireModel.findById(id).exec();
-    if (!questionnaire) {
-      throw new NotFoundException('Cuestionario no encontrado');
+    try {
+      const objectId = new Types.ObjectId(id); // convierte el id a ObjectId
+      const questionnaire = await this.questionnaireModel.findById(objectId).exec();
+      if (!questionnaire) {
+        throw new NotFoundException('Cuestionario no encontrado');
+      }
+      return questionnaire;
+    } catch (error) {
+      throw new NotFoundException('ID no válido o cuestionario no encontrado');
     }
-    return questionnaire;
   }
 
   // Método para actualizar un cuestionario por su ID
@@ -34,5 +40,11 @@ export class QuestionnaireService {
       throw new NotFoundException('No se pudo actualizar el cuestionario');
     }
     return updatedQuestionnaire;
+  }
+
+  // Método para crear un cuestionario
+  async create(createQuestionnaireDto: CreateQuestionnaireDto): Promise<Questionnaire> {
+    const newQuestionnaire = new this.questionnaireModel(createQuestionnaireDto);
+    return newQuestionnaire.save();
   }
 }
