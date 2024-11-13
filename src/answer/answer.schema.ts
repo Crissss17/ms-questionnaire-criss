@@ -1,15 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type AnswerDocument = Answer & Document;
-
 @Schema()
-export class Answer {
+export class Answer extends Document {
   @Prop({ required: true })
-  questionnaireId: string; // Almacenado como string
+  userId: string;  
 
   @Prop({ required: true })
-  answerText: string; // Almacenado como string
+  questionnaireId: string;
+
+  @Prop({ type: Array, required: true })  
+  sections: any[];
+
+  @Prop()
+  vehiculo: string;
 }
 
 export const AnswerSchema = SchemaFactory.createForClass(Answer);

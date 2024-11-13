@@ -1,3 +1,4 @@
+// update-questionnaire.dto.ts
 import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -5,8 +6,22 @@ class UpdateQuestionDto {
   @IsString()
   text: string;
 
+  @IsOptional()
   @IsString()
-  answer: string;
+  answer?: string;
+
+  @IsString()
+  type: 'yes-no' | 'multiple-choice' | 'text';
+}
+
+class UpdateSectionDto {
+  @IsString()
+  name: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateQuestionDto)
+  questions: UpdateQuestionDto[];
 }
 
 export class UpdateQuestionnaireDto {
@@ -17,10 +32,10 @@ export class UpdateQuestionnaireDto {
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => UpdateQuestionDto)
-  readonly questions?: UpdateQuestionDto[];
+  @Type(() => UpdateSectionDto)
+  readonly sections?: UpdateSectionDto[];
 
   @IsOptional()
   @IsString()
-  readonly vehiculo?: string;  // Nuevo campo opcional para el tipo de vehículo
+  readonly vehiculo?: string;
 }

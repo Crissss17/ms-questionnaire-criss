@@ -11,15 +11,14 @@ export class QuestionnaireService {
     @InjectModel(Questionnaire.name) private questionnaireModel: Model<Questionnaire>,
   ) {}
 
-  // Encuentra todos los cuestionarios
   async findAll(): Promise<Questionnaire[]> {
     return this.questionnaireModel.find().exec();
   }
 
-  // Método para buscar un cuestionario por su ID
+
   async findById(id: string): Promise<Questionnaire> {
     try {
-      const objectId = new Types.ObjectId(id); // convierte el id a ObjectId
+      const objectId = new Types.ObjectId(id); 
       const questionnaire = await this.questionnaireModel.findById(objectId).exec();
       if (!questionnaire) {
         throw new NotFoundException('Cuestionario no encontrado');
@@ -30,21 +29,21 @@ export class QuestionnaireService {
     }
   }
 
-  // Método para actualizar un cuestionario por su ID
-  async update(id: string, updateQuestionnaireDto: UpdateQuestionnaireDto): Promise<Questionnaire> {
-    const updatedQuestionnaire = await this.questionnaireModel
-      .findByIdAndUpdate(id, updateQuestionnaireDto, { new: true })
-      .exec();
-      
-    if (!updatedQuestionnaire) {
-      throw new NotFoundException('No se pudo actualizar el cuestionario');
-    }
-    return updatedQuestionnaire;
-  }
 
-  // Método para crear un cuestionario
-  async create(createQuestionnaireDto: CreateQuestionnaireDto): Promise<Questionnaire> {
-    const newQuestionnaire = new this.questionnaireModel(createQuestionnaireDto);
-    return newQuestionnaire.save();
+async create(createQuestionnaireDto: CreateQuestionnaireDto): Promise<Questionnaire> {
+  const newQuestionnaire = new this.questionnaireModel(createQuestionnaireDto);
+  return newQuestionnaire.save();  // Asegúrate de que esto esté bien.
+}
+
+async update(id: string, updateQuestionnaireDto: UpdateQuestionnaireDto): Promise<Questionnaire> {
+  const updatedQuestionnaire = await this.questionnaireModel
+    .findByIdAndUpdate(id, updateQuestionnaireDto, { new: true })
+    .exec();
+
+  if (!updatedQuestionnaire) {
+    throw new NotFoundException('No se pudo actualizar el cuestionario');
   }
+  return updatedQuestionnaire;
+}
+
 }

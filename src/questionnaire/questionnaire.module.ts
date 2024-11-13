@@ -8,7 +8,7 @@ import { AuthModule } from 'src/auth/check-token/auth.module'; // Importa el Aut
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Questionnaire.name, schema: QuestionnaireSchema }]),
-    AuthModule,  // Asegúrate de importar AuthModule
+    AuthModule,  
   ],
   controllers: [QuestionnaireController],
   providers: [QuestionnaireService],

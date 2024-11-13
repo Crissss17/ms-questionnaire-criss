@@ -1,14 +1,17 @@
+// src/answers/answer.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Answer, AnswerSchema } from './schemas/answer.schema';
-import { AnswersService } from './answer.service';
-import { AnswersController } from './answer.controller';
+import { AnswerController } from './answer.controller';
+import { AnswerService } from './answer.service';
+import { Answer, AnswerSchema } from './answer.schema';
+import { AuthModule } from 'src/auth/check-token/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Answer.name, schema: AnswerSchema }])
+    MongooseModule.forFeature([{ name: Answer.name, schema: AnswerSchema }]),
+    AuthModule, 
   ],
-  controllers: [AnswersController],
-  providers: [AnswersService],
+  controllers: [AnswerController],
+  providers: [AnswerService],
 })
-export class AnswerModule {}
+export class AnswersModule {}

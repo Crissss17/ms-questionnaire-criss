@@ -1,45 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Answer, AnswerDocument } from './schemas/answer.schema';
+import { Answer } from './answer.schema';
 import { CreateAnswerDto } from './dto/create-answer.dto';
-import { UpdateAnswerDto } from './dto/update-answer.dto';
 
 @Injectable()
-export class AnswersService {
-  constructor(@InjectModel(Answer.name) private answerModel: Model<AnswerDocument>) {}
+export class AnswerService {
+  constructor(@InjectModel(Answer.name) private readonly answerModel: Model<Answer>) {}
 
-  async create(createAnswerDto: CreateAnswerDto): Promise<Answer> {
-    const createdAnswer = new this.answerModel(createAnswerDto);
-    return createdAnswer.save();
-  }
-
-  async findAll(): Promise<Answer[]> {
-    return this.answerModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<Answer> {
-    const answer = await this.answerModel.findById(id).exec();
-    if (!answer) {
-      throw new NotFoundException(`Answer with ID ${id} not found`);
+  async createAnswer(createAnswerDto: CreateAnswerDto): Promise<Answer> {
+    try {
+      const newAnswer = new this.answerModel(createAnswerDto);
+      return await newAnswer.save();
+    } catch (error) {
+      console.error('Error al guardar en la base de datos:', error);
+      throw new InternalServerErrorException('No se pudo guardar la respuesta en la base de datos');
     }
-    return answer;
   }
 
-  // Cambia CreateAnswerDto por UpdateAnswerDto aquí
-  async update(id: string, updateAnswerDto: UpdateAnswerDto): Promise<Answer> {
-    const updatedAnswer = await this.answerModel.findByIdAndUpdate(id, updateAnswerDto, { new: true }).exec();
-    if (!updatedAnswer) {
-      throw new NotFoundException(`Answer with ID ${id} not found`);
-    }
-    return updatedAnswer;
+  async getUserHistory(userId: string): Promise<Answer[]> {
+    console.log("Buscando respuestas para userId:", userId);
+    return this.answerModel.find({ userId }).exec();
   }
 
-  async remove(id: string): Promise<Answer> {
-    const deletedAnswer = await this.answerModel.findByIdAndDelete(id).exec();
-    if (!deletedAnswer) {
-      throw new NotFoundException(`Answer with ID ${id} not found`);
-    }
-    return deletedAnswer;
+  async findAnswerById(id: string): Promise<Answer> {
+    return this.answerModel.findById(id).exec();
   }
 }

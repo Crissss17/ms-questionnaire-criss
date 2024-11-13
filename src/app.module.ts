@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
-import { AnswerModule } from './answer/answer.module';
+import { AnswersModule } from './answer/answer.module';
 import { AuthModule } from './auth/check-token/auth.module'; 
 import { CheckTokenGuard } from './auth/check-token/check-token.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -18,7 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
       dbName: process.env.MONGODB_DATABASE,
     }),
     QuestionnaireModule,
-    AnswerModule,
+    AnswersModule,
     AuthModule, 
   ],
   controllers: [AppController],

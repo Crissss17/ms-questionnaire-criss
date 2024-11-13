@@ -1,47 +1,42 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, NotFoundException } from '@nestjs/common';
-import { AnswersService } from './answer.service';
+import { Body, Controller, Get, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { AnswerService } from './answer.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
-import { UpdateAnswerDto } from './dto/update-answer.dto';
+import { JwtAuthGuard } from 'src/auth/check-token/jwt-auth.guard';
+import { Answer } from './answer.schema';
 
 @Controller('answers')
-export class AnswersController {
-  constructor(private readonly answersService: AnswersService) {}
+export class AnswerController {
+  constructor(private readonly answerService: AnswerService) {}
 
-  // Crear una respuesta
   @Post()
-  create(@Body() createAnswerDto: CreateAnswerDto) {
-    return this.answersService.create(createAnswerDto);
+  async createAnswer(@Body() createAnswerDto: CreateAnswerDto) {
+    console.log("Datos recibidos en el controlador:", createAnswerDto);  // Verifica los datos que se están enviando
+    try {
+      return await this.answerService.createAnswer(createAnswerDto);
+    } catch (error) {
+      console.error("Error al guardar en 'answers':", error);  // Log detallado del error
+      throw new InternalServerErrorException('No se pudo guardar la respuesta en la base de datos');
+    }
   }
 
-  // Obtener todas las respuestas
-  @Get()
-  findAll() {
-    return this.answersService.findAll();
+  @Get('user-history')
+  async getUserHistory(@Query('userId') userId: string) {
+    try {
+      console.log("userId recibido:", userId);
+      return await this.answerService.getUserHistory(userId);
+    } catch (error) {
+      console.error("Error en getUserHistory:", error);
+      throw new InternalServerErrorException("No se pudo obtener el historial de respuestas.");
+    }
   }
 
-  // Obtener una respuesta por ID
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const answer = await this.answersService.findOne(id);
-    if (!answer) {
-      throw new NotFoundException(`Answer with ID ${id} not found`);
+  async findAnswerById(@Param('id') id: string) {
+    try {
+      return await this.answerService.findAnswerById(id);
+    } catch (error) {
+      console.error("Error en findAnswerById:", error);
+      throw new InternalServerErrorException("No se pudo obtener la respuesta.");
     }
-    return answer;
-  }
-
-  // Actualizar una respuesta por ID
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateAnswerDto: UpdateAnswerDto) {
-    return this.answersService.update(id, updateAnswerDto);
-  }
-
-  // Eliminar una respuesta por ID
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    const answer = await this.answersService.remove(id);
-    if (!answer) {
-      throw new NotFoundException(`Answer with ID ${id} not found`);
-    }
-    return { message: `Answer with ID ${id} removed successfully` };
   }
 }

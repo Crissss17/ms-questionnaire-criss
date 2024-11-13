@@ -1,14 +1,28 @@
-// dto/create-questionnaire.dto.ts
-import { IsString, IsArray, ArrayNotEmpty, ValidateNested, IsOptional } from 'class-validator';
+// create-questionnaire.dto.ts
 import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsArray, ValidateNested, IsEnum } from 'class-validator';
 
 class QuestionDto {
   @IsString()
   text: string;
 
-  @IsOptional() 
+  @IsString()
+  @IsEnum(['Sí/No', 'Alternativa', 'Texto'])
+  type: 'Sí/No' | 'Alternativa' | 'Texto';
+
+  @IsOptional() // <-- Asegúrate de que la respuesta sea opcional
   @IsString()
   answer?: string;
+}
+
+class SectionDto {
+  @IsString()
+  name: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => QuestionDto)
+  questions: QuestionDto[];
 }
 
 export class CreateQuestionnaireDto {
@@ -16,22 +30,11 @@ export class CreateQuestionnaireDto {
   readonly name: string;
 
   @IsArray()
-  @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => QuestionDto)
-  readonly questions: QuestionDto[];
+  @Type(() => SectionDto)
+  readonly sections: SectionDto[];
 
-  @IsString()  // Nuevo campo para "vehiculo"
   @IsOptional()
-  readonly vehiculo?: string;
-}
-
-// dto/update-questionnaire.dto.ts
-export class UpdateQuestionnaireDto {
-  readonly name?: string;
-  readonly questions?: Array<{ text: string; answer: string }>;
-
-  @IsString()  // Nuevo campo para "vehiculo"
-  @IsOptional()
+  @IsString()
   readonly vehiculo?: string;
 }
