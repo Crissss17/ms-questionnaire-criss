@@ -1,6 +1,5 @@
-// update-questionnaire.dto.ts
 import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 class UpdateQuestionDto {
   @IsString()
@@ -11,7 +10,7 @@ class UpdateQuestionDto {
   answer?: string;
 
   @IsString()
-  type: 'yes-no' | 'multiple-choice' | 'text';
+  type: 'Sí/No' | 'Alternativa' | 'Texto';
 }
 
 class UpdateSectionDto {
@@ -30,12 +29,27 @@ export class UpdateQuestionnaireDto {
   readonly name?: string;
 
   @IsOptional()
+  @IsString()
+  readonly vehiculo?: string;
+
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => UpdateSectionDto)
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value); // Asegura que se pueda parsear a JSON
+      } catch (error) {
+        throw new Error('Invalid JSON format for sections');
+      }
+    }
+    return value;
+  })
   readonly sections?: UpdateSectionDto[];
 
   @IsOptional()
-  @IsString()
-  readonly vehiculo?: string;
+  @IsArray()
+  @Transform(({ value }) => Array.isArray(value) ? value : []) // Asegura que images siempre sea un array
+  images?: string[];
 }

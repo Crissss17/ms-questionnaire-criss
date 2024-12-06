@@ -1,21 +1,27 @@
-// create-questionnaire.dto.ts
 import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsArray, ValidateNested, IsEnum } from 'class-validator';
 
-class QuestionDto {
+export class QuestionDto {
+  @IsOptional()
+  @IsString()
+  _id?: string;
+
   @IsString()
   text: string;
 
-  @IsString()
   @IsEnum(['Sí/No', 'Alternativa', 'Texto'])
   type: 'Sí/No' | 'Alternativa' | 'Texto';
 
-  @IsOptional() // <-- Asegúrate de que la respuesta sea opcional
+  @IsOptional()
   @IsString()
   answer?: string;
 }
 
-class SectionDto {
+export class SectionDto {
+  @IsOptional()
+  @IsString()
+  _id?: string;
+
   @IsString()
   name: string;
 
@@ -24,6 +30,7 @@ class SectionDto {
   @Type(() => QuestionDto)
   questions: QuestionDto[];
 }
+
 
 export class CreateQuestionnaireDto {
   @IsString()
@@ -37,4 +44,8 @@ export class CreateQuestionnaireDto {
   @IsOptional()
   @IsString()
   readonly vehiculo?: string;
+
+  @IsOptional()
+  @IsArray()
+  images?: string[];
 }

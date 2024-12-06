@@ -1,17 +1,53 @@
-import { IsNotEmpty, IsString, IsArray } from 'class-validator';
+import { IsString, IsArray, ValidateNested, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class LocationDto {
+  @IsNumber()
+  latitude: number;
+
+  @IsNumber()
+  longitude: number;
+}
+
+export class CreateQuestionAnswerDto {
+  @IsString()
+  @IsNotEmpty()
+  questionId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  response: string;
+}
+
+export class CreateSectionDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => CreateQuestionAnswerDto)
+  questions: CreateQuestionAnswerDto[];
+}
 
 export class CreateAnswerDto {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   userId: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   questionnaireId: string;
 
-  @IsArray()
-  sections: any[];  // Usa el tipo correcto según el esquema
-
   @IsString()
+  @IsNotEmpty()
   vehiculo: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => CreateSectionDto)
+  sections: CreateSectionDto[];
+
+  @ValidateNested()
+  @IsOptional() 
+  @Type(() => LocationDto)
+  location?: LocationDto;
 }

@@ -1,4 +1,3 @@
-// auth/jwt-auth.guard.ts
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -14,11 +13,10 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('No se encontró el token de autorización');
     }
 
-    const token = authorization.split(' ')[1]; // Extrae el token del header
+    const token = authorization.split(' ')[1]; 
     try {
-      // Verifica el token
       const decoded = this.jwtService.verify(token);
-      request.user = decoded; // Guarda los datos decodificados del token en el request
+      request.user = decoded; 
       return true;
     } catch (error) {
       throw new UnauthorizedException('Token inválido o expirado');

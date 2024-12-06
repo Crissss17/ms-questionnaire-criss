@@ -5,11 +5,10 @@ import * as jwt from 'jsonwebtoken';
 export class AuthService {
   private readonly jwtSecret = process.env.JWT_SECRET || 'miSuperSecreto';
 
-  // Servicio para verificar el token (checkToken en MS-2)
   async validateToken(token: string) {
     try {
       console.log('Validating token:', token);
-      const decoded = jwt.verify(token, this.jwtSecret);  // Verifica que este secreto sea el mismo que en MS-1
+      const decoded = jwt.verify(token, this.jwtSecret);  
       console.log('Token decoded:', decoded);
       return { valid: true, decoded };
     } catch (error) {

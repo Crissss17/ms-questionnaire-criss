@@ -1,42 +1,68 @@
-import { Body, Controller, Get, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { AnswerService } from './answer.service';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  UploadedFiles,
+  UseInterceptors,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { AnswersService } from './answer.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
-import { JwtAuthGuard } from 'src/auth/check-token/jwt-auth.guard';
-import { Answer } from './answer.schema';
+import { QuestionnaireService } from '../questionnaire/questionnaire.service';
 
 @Controller('answers')
-export class AnswerController {
-  constructor(private readonly answerService: AnswerService) {}
+export class AnswersController {
+  constructor(
+    private readonly answersService: AnswersService,
+    private readonly questionnaireService: QuestionnaireService, 
+  ) {}
 
   @Post()
   async createAnswer(@Body() createAnswerDto: CreateAnswerDto) {
-    console.log("Datos recibidos en el controlador:", createAnswerDto);  // Verifica los datos que se están enviando
-    try {
-      return await this.answerService.createAnswer(createAnswerDto);
-    } catch (error) {
-      console.error("Error al guardar en 'answers':", error);  // Log detallado del error
-      throw new InternalServerErrorException('No se pudo guardar la respuesta en la base de datos');
-    }
+    console.log('Datos recibidos en el backend:', JSON.stringify(createAnswerDto, null, 2));
+    return this.answersService.create(createAnswerDto);
   }
 
-  @Get('user-history')
-  async getUserHistory(@Query('userId') userId: string) {
-    try {
-      console.log("userId recibido:", userId);
-      return await this.answerService.getUserHistory(userId);
-    } catch (error) {
-      console.error("Error en getUserHistory:", error);
-      throw new InternalServerErrorException("No se pudo obtener el historial de respuestas.");
-    }
-  }
 
   @Get(':id')
-  async findAnswerById(@Param('id') id: string) {
-    try {
-      return await this.answerService.findAnswerById(id);
-    } catch (error) {
-      console.error("Error en findAnswerById:", error);
-      throw new InternalServerErrorException("No se pudo obtener la respuesta.");
+  async getAnswer(@Param('id') id: string) {
+    return this.answersService.findById(id);
+  }
+
+  @Post(':id/images')
+  @UseInterceptors(FilesInterceptor('files', 10, { dest: './uploads/answers' })) 
+  async uploadImages(
+    @Param('id') id: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No se han subido archivos.');
     }
+
+    const imagePaths = files.map((file) => file.path); 
+    return this.answersService.addImages(id, imagePaths);
+  }
+
+  @Get('user-history/:userId')
+  async getUserAnswers(@Param('userId') userId: string) {
+    return this.answersService.findByUserId(userId);
+  }
+
+  @Get('details/:id') 
+  async getAnswerWithDetails(@Param('id') id: string) {
+    return this.answersService.findByIdWithDetails(id);
+  }
+
+  @Get('questionnaire/:id') 
+  async getQuestionnaire(@Param('id') id: string) {
+    const questionnaire = await this.questionnaireService.findById(id);
+    if (!questionnaire) {
+      throw new NotFoundException('Cuestionario no encontrado');
+    }
+    return questionnaire; 
   }
 }
